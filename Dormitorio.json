@@ -1,0 +1,168 @@
+[
+    {
+        "id": "16dc7746e4550fbe",
+        "type": "group",
+        "z": "cd14d999b5b5461b",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "abefa0436b667da4",
+            "e4e2f26850c9442f",
+            "5b943779c7d47547",
+            "81a490b15319f9cb",
+            "16ac3004b030dd95"
+        ],
+        "x": 34,
+        "y": 39,
+        "w": 1022,
+        "h": 142
+    },
+    {
+        "id": "abefa0436b667da4",
+        "type": "ui_button",
+        "z": "cd14d999b5b5461b",
+        "g": "16dc7746e4550fbe",
+        "name": "Luz Dormitorio",
+        "group": "088bfb88ea1098ca",
+        "order": 20,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Cambiar luz dormitorio",
+        "tooltip": "Encender/Apagar luz",
+        "color": "#ffffff",
+        "bgcolor": "#607d8b",
+        "className": "",
+        "icon": "fa-lightbulb-o",
+        "payload": "TOGGLE",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 140,
+        "y": 80,
+        "wires": [
+            [
+                "81a490b15319f9cb"
+            ]
+        ]
+    },
+    {
+        "id": "e4e2f26850c9442f",
+        "type": "ui_slider",
+        "z": "cd14d999b5b5461b",
+        "g": "16dc7746e4550fbe",
+        "name": "Intensidad Luz Dormitorio",
+        "label": "Intensidad",
+        "group": "088bfb88ea1098ca",
+        "order": 14,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "outs": "all",
+        "topic": "",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "5b943779c7d47547"
+            ]
+        ]
+    },
+    {
+        "id": "5b943779c7d47547",
+        "type": "function",
+        "z": "cd14d999b5b5461b",
+        "g": "16dc7746e4550fbe",
+        "name": "Formatear intensidad",
+        "func": "return { payload: { intensity: msg.payload } };",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 140,
+        "wires": [
+            [
+                "81a490b15319f9cb"
+            ]
+        ]
+    },
+    {
+        "id": "81a490b15319f9cb",
+        "type": "ui_template",
+        "z": "cd14d999b5b5461b",
+        "g": "16dc7746e4550fbe",
+        "group": "088bfb88ea1098ca",
+        "name": "Lógica Luz Dormitorio",
+        "order": 29,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n(function(scope) {\n  if (scope.dormitorioLightState === undefined) {\n    scope.dormitorioLightState = 'OFF';\n  }\n  if (scope.dormitorioIntensity === undefined) {\n    scope.dormitorioIntensity = 50;\n  }\n\n  scope.$watch('msg', function(msg) {\n    if(msg.payload === 'TOGGLE') {\n      scope.dormitorioLightState = (scope.dormitorioLightState === 'ON') ? 'OFF' : 'ON';\n    } else if (msg.payload && typeof msg.payload.intensity === 'number' && scope.dormitorioLightState === 'ON') {\n      scope.dormitorioIntensity = msg.payload.intensity;\n    } else if (msg.payload === 'OFF') {\n      scope.dormitorioLightState = 'OFF';\n    }\n    scope.send({ payload: { state: scope.dormitorioLightState, intensity: scope.dormitorioIntensity } });\n  });\n\n  scope.send({ payload: { state: scope.dormitorioLightState, intensity: scope.dormitorioIntensity } });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 680,
+        "y": 80,
+        "wires": [
+            [
+                "16ac3004b030dd95"
+            ]
+        ]
+    },
+    {
+        "id": "16ac3004b030dd95",
+        "type": "ui_template",
+        "z": "cd14d999b5b5461b",
+        "g": "16dc7746e4550fbe",
+        "group": "088bfb88ea1098ca",
+        "name": "Estado Luz Dormitorio",
+        "order": 4,
+        "width": 5,
+        "height": 4,
+        "format": "<style>\n  .light-info-label {\n    font-size: 0.95em;\n    color: #fff;\n    margin-top: 5px;\n    background: transparent !important;\n  }\n  .light-info-value {\n    font-size: 1em;\n    color: #1CAAD9;\n    margin-bottom: 5px;\n    font-weight: bold;\n    background: transparent !important;\n  }\n  #sketchfab-light-container {\n    width: 140px;\n    height: 140px;\n    margin: 0 auto;\n    background: transparent !important;\n    box-shadow: none !important;\n    border: none !important;\n    padding: 0;\n    overflow: hidden;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: opacity 0.5s;\n  }\n  #skfb-iframe-light {\n    width: 100%;\n    height: 100%;\n    border: none;\n    background: transparent !important;\n    display: block;\n    transition: filter 0.5s;\n  }\n</style>\n<div style=\"display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;\">\n  <div id=\"sketchfab-light-container\">\n    <iframe id=\"skfb-iframe-light\"\n      title=\"Fat Lamp\"\n      allowfullscreen\n      mozallowfullscreen=\"true\"\n      webkitallowfullscreen=\"true\"\n      allow=\"autoplay; fullscreen; xr-spatial-tracking\"\n      xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share\n      src=\"https://sketchfab.com/models/4602fa8c465741a7b0dc1d6a9a1de744/embed?autospin=0&autostart=0&camera=0&preload=1&transparent=1\"\n      style=\"background:transparent !important;\">\n    </iframe>\n  </div>\n  <div class=\"light-info-label\">Luz: <span class=\"light-info-value\">{{msg.payload.state}}</span></div>\n  <div class=\"light-info-label\">Intensidad: <span class=\"light-info-value\">{{msg.payload.intensity}}%</span></div>\n</div>\n<script src=\"https://static.sketchfab.com/api/sketchfab-viewer-1.12.0.js\"></script>\n<script>\n(function(scope){\n  var uid = \"4602fa8c465741a7b0dc1d6a9a1de744\";\n  var iframe = document.getElementById('skfb-iframe-light');\n  var container = document.getElementById('sketchfab-light-container');\n  var client = null;\n  var skfbAPI = null;\n  var isReady = false;\n\n  function setLightAppearance(on, intensity) {\n    if(container) {\n      if(on) {\n        container.style.opacity = Math.max(0.35, (intensity||0) / 100);\n        iframe.style.filter = \"none\";\n      } else {\n        container.style.opacity = \"0.35\";\n        iframe.style.filter = \"grayscale(100%) blur(1.5px)\";\n      }\n    }\n  }\n\n  function initSketchfab() {\n    client = new Sketchfab(iframe);\n    client.init(uid, {\n      autostart: false,\n      autospin: 0.8,\n      transparent: 1,\n      success: function(api) {\n        skfbAPI = api;\n        api.start();\n        api.addEventListener('viewerready', function() {\n          api.pause();\n          isReady = true;\n          setLightAppearance(false, 0);\n        });\n      },\n      error: function() {\n        console.error('Sketchfab API error');\n      }\n    });\n  }\n\n  scope.$watch('msg.payload', function(data){\n    if (!data) return;\n    if (skfbAPI && isReady) {\n      const on = data.state === \"ON\";\n      setLightAppearance(on, data.intensity || 0);\n      if(on) {\n        skfbAPI.play();\n        skfbAPI.setAutospin(0.8);\n      } else {\n        skfbAPI.pause();\n        skfbAPI.setAutospin(0);\n      }\n    }\n  });\n\n  setTimeout(initSketchfab, 0);\n  scope.$on && scope.$on('$destroy', function() {\n    if(skfbAPI) skfbAPI.pause();\n  });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 930,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "088bfb88ea1098ca",
+        "type": "ui_group",
+        "name": "Dormitorio",
+        "tab": "c351ef522910c2c5",
+        "order": 2,
+        "disp": true,
+        "width": 25,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c351ef522910c2c5",
+        "type": "ui_tab",
+        "name": "Hogar Inteligente",
+        "icon": "dashboard",
+        "order": 8,
+        "disabled": false,
+        "hidden": false
+    }
+]

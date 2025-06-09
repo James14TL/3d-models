@@ -1,0 +1,141 @@
+[
+    {
+        "id": "644e4de2c238a565",
+        "type": "ui_button",
+        "z": "12215a9e61ffd026",
+        "name": "Luz ",
+        "group": "9d0ee45f408b5573",
+        "order": 22,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Cambiar luz ",
+        "tooltip": "Encender/Apagar luz",
+        "color": "#ffffff",
+        "bgcolor": "#607d8b",
+        "className": "",
+        "icon": "fa-lightbulb-o",
+        "payload": "TOGGLE",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "be69018b647f5df1"
+            ]
+        ]
+    },
+    {
+        "id": "9e38ee89542f2b8d",
+        "type": "ui_slider",
+        "z": "12215a9e61ffd026",
+        "name": "Intensidad Luz ",
+        "label": "Intensidad",
+        "tooltip": "",
+        "group": "9d0ee45f408b5573",
+        "order": 27,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "outs": "all",
+        "topic": "",
+        "topicType": "str",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "className": "",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "a846ac9a735b8b1b"
+            ]
+        ]
+    },
+    {
+        "id": "a846ac9a735b8b1b",
+        "type": "function",
+        "z": "12215a9e61ffd026",
+        "name": "Formatear intensidad",
+        "func": "return { payload: { intensity: msg.payload } };",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 140,
+        "wires": [
+            [
+                "be69018b647f5df1"
+            ]
+        ]
+    },
+    {
+        "id": "be69018b647f5df1",
+        "type": "ui_template",
+        "z": "12215a9e61ffd026",
+        "group": "9d0ee45f408b5573",
+        "name": "Lógica Luz ",
+        "order": 29,
+        "width": 6,
+        "height": 1,
+        "format": "<script>\n(function(scope) {\n  if (scope.salaLightState === undefined) {\n    scope.salaLightState = 'OFF';\n  }\n  if (scope.salaIntensity === undefined) {\n    scope.salaIntensity = 50;\n  }\n\n  scope.$watch('msg', function(msg) {\n    if(msg.payload === 'TOGGLE') {\n      scope.salaLightState = (scope.salaLightState === 'ON') ? 'OFF' : 'ON';\n    } else if (msg.payload && typeof msg.payload.intensity === 'number' && scope.salaLightState === 'ON') {\n      scope.salaIntensity = msg.payload.intensity;\n    } else if (msg.payload === 'OFF') {\n      scope.salaLightState = 'OFF';\n    }\n    scope.send({ payload: { state: scope.salaLightState, intensity: scope.salaIntensity } });\n  });\n\n  scope.send({ payload: { state: scope.salaLightState, intensity: scope.salaIntensity } });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 550,
+        "y": 80,
+        "wires": [
+            [
+                "12d26ef231138142"
+            ]
+        ]
+    },
+    {
+        "id": "12d26ef231138142",
+        "type": "ui_template",
+        "z": "12215a9e61ffd026",
+        "group": "9d0ee45f408b5573",
+        "name": "Estado Luz ",
+        "order": 2,
+        "width": 5,
+        "height": 4,
+        "format": "<style>\n  .light-info-label {\n    font-size: 0.95em;\n    color: #fff;\n    margin-top: 5px;\n    background: transparent !important;\n  }\n  .light-info-value {\n    font-size: 1em;\n    color: #1CAAD9;\n    margin-bottom: 5px;\n    font-weight: bold;\n    background: transparent !important;\n  }\n  #sketchfab-light-container {\n    width: 100px;\n    height: 120px;\n    margin: 0 auto;\n    background: transparent !important;\n    box-shadow: none !important;\n    border: none !important;\n    padding: 0;\n    overflow: hidden;\n    transition: opacity 0.6s;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n  }\n  #skfb-iframe-light {\n    width: 100%;\n    height: 100%;\n    border: none;\n    background: transparent !important;\n    display: block;\n    transition: filter 0.5s;\n  }\n</style>\n<div style=\"display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;\">\n  <div id=\"sketchfab-light-container\">\n    <iframe id=\"skfb-iframe-light\" title=\"Light bulb\" allowfullscreen mozallowfullscreen=\"true\"\n      webkitallowfullscreen=\"true\" allow=\"autoplay; fullscreen; xr-spatial-tracking\" xr-spatial-tracking\n      execution-while-out-of-viewport execution-while-not-rendered web-share\n      src=\"https://sketchfab.com/models/e8c7de5b2047474993170b8f3c87e00c/embed?autospin=0&autostart=0&camera=0&preload=1&transparent=1\"\n      style=\"background:transparent !important;\">\n    </iframe>\n  </div>\n  <div class=\"light-info-label\">Luz: <span class=\"light-info-value\">{{msg.payload.state}}</span></div>\n  <div class=\"light-info-label\">Intensidad: <span class=\"light-info-value\">{{msg.payload.intensity}}%</span></div>\n</div>\n<script src=\"https://static.sketchfab.com/api/sketchfab-viewer-1.12.0.js\"></script>\n<script>\n  (function(scope){\n  var uid = \"e8c7de5b2047474993170b8f3c87e00c\";\n  var iframe = document.getElementById('skfb-iframe-light');\n  var container = document.getElementById('sketchfab-light-container');\n  var client = null;\n  var skfbAPI = null;\n  var isReady = false;\n  function setLightAppearance(on, intensity) {\n    if(container) {\n      if(on) {\n        container.style.opacity = Math.max(0.35, intensity / 100);\n        iframe.style.filter = \"none\";\n      } else {\n        container.style.opacity = \"0.35\";\n        iframe.style.filter = \"grayscale(100%) blur(1.5px)\";\n      }\n    }\n  }\n  function initSketchfab() {\n    client = new Sketchfab(iframe);\n    client.init(uid, {\n      autostart: false,\n      autospin: 0.5,\n      transparent: 1,\n      success: function(api) {\n        skfbAPI = api;\n        api.start();\n        api.addEventListener('viewerready', function() {\n          api.pause();\n          isReady = true;\n          setLightAppearance(false, 0);\n        });\n      },\n      error: function() {\n        console.error('Sketchfab API error');\n      }\n    });\n  }\n  scope.$watch('msg.payload', function(data){\n    if (!data) return;\n    if (skfbAPI && isReady) {\n      const on = data.state === \"ON\";\n      setLightAppearance(on, data.intensity || 0);\n      if(on) {\n        skfbAPI.play();\n        skfbAPI.setAutospin(0.5);\n      } else {\n        skfbAPI.pause();\n        skfbAPI.setAutospin(0);\n      }\n    }\n  });\n  setTimeout(initSketchfab, 0);\n  scope.$on && scope.$on('$destroy', function() {\n    if(skfbAPI) skfbAPI.pause();\n  });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 770,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9d0ee45f408b5573",
+        "type": "ui_group",
+        "name": "Sala",
+        "tab": "c351ef522910c2c5",
+        "order": 1,
+        "disp": true,
+        "width": 29,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c351ef522910c2c5",
+        "type": "ui_tab",
+        "name": "Hogar Inteligente",
+        "icon": "dashboard",
+        "order": 8,
+        "disabled": false,
+        "hidden": false
+    }
+]
